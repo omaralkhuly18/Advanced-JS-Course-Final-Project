@@ -1,12 +1,10 @@
-const baseUrl = "http://localhost:3030/api/v1"
-// const baseUrl = "https://tarmeezAcademy.com/api/v1"
+// const baseUrl = "http://localhost:3030/api/v1"
+const baseUrl = "https://tarmeezAcademy.com/api/v1"
 
 // ======= POST REQUESTS ======////
 function createNewPostClicked() {
     let postId = document.getElementById("post-id-input").value
     let isCreate = postId == null || postId == ""
-    
-
 
     const title = document.getElementById("post-title-input").value
     const body = document.getElementById("post-body-input").value
@@ -19,17 +17,16 @@ function createNewPostClicked() {
     formData.append("image", image)
 
 
-    let url = ``        
+    let url = ``
     const headers = {
         "Content-Type": "multipart/form-data",
         "authorization": `Bearer ${token}`
     }
 
-    if(isCreate)
-    {
-        url = `${baseUrl}/posts`            
+    if (isCreate) {
+        url = `${baseUrl}/posts`
 
-    }else {
+    } else {
 
         formData.append("_method", "put")
         url = `${baseUrl}/posts/${postId}`
@@ -39,30 +36,29 @@ function createNewPostClicked() {
     axios.post(url, formData, {
         headers: headers
     })
-    .then((response) => {
-        const modal = document.getElementById("create-post-modal")
-        const modalInstance = bootstrap.Modal.getInstance(modal)
-        modalInstance.hide()
-        showAlert("New Post Has Been Created", "success")
-        getPosts()
+        .then((response) => {
+            const modal = document.getElementById("create-post-modal")
+            const modalInstance = bootstrap.Modal.getInstance(modal)
+            modalInstance.hide()
+            showAlert("New Post Has Been Created", "success")
+            getPosts()
 
-    })
-    .catch((error) => {
-        const message = error.response.data.message
-        showAlert(message, "danger")
-    })
-    .finally(() => {
-        toggleLoader(false)
-    })
+        })
+        .catch((error) => {
+            const message = error.response.data.message
+            showAlert(message, "danger")
+        })
+        .finally(() => {
+            toggleLoader(false)
+        })
 
-    
+
 }
 
-function editPostBtnClicked(postObject)
-{
+function editPostBtnClicked(postObject) {
     let post = JSON.parse(decodeURIComponent(postObject))
     console.log(post)
-    
+
     document.getElementById("post-modal-submit-btn").innerHTML = "Update"
     document.getElementById("post-id-input").value = post.id
     document.getElementById("post-modal-title").innerHTML = "Edit Post"
@@ -72,8 +68,7 @@ function editPostBtnClicked(postObject)
     postModal.toggle()
 }
 
-function deletePostBtnClicked(postObject)
-{
+function deletePostBtnClicked(postObject) {
     let post = JSON.parse(decodeURIComponent(postObject))
     console.log(post)
 
@@ -95,28 +90,26 @@ function confirmPostDelete() {
     axios.delete(url, {
         headers: headers
     })
-    .then((response) => {
-        const modal = document.getElementById("delete-post-modal")
-        const modalInstance = bootstrap.Modal.getInstance(modal)
-        modalInstance.hide()
-        showAlert("The Post Has Been Deleted Successfully", "success")
-        getPosts()
+        .then((response) => {
+            const modal = document.getElementById("delete-post-modal")
+            const modalInstance = bootstrap.Modal.getInstance(modal)
+            modalInstance.hide()
+            showAlert("The Post Has Been Deleted Successfully", "success")
+            getPosts()
 
-    }).catch((error) => {
-        const message = error.response.data.message
-        showAlert(message, "danger")
-    })
+        }).catch((error) => {
+            const message = error.response.data.message
+            showAlert(message, "danger")
+        })
 }
 
 
-function profileClicked()
-{
+function profileClicked() {
     const user = getCurrentUser()
     const userId = user.id
     window.location = `profile.html?userid=${userId}`
 }
-function setupUI()
-{
+function setupUI() {
     const token = localStorage.getItem("token")
 
     const loginDiv = document.getElementById("logged-in-div")
@@ -125,22 +118,20 @@ function setupUI()
     // add btn
     const addBtn = document.getElementById("add-btn")
 
-    if(token == null) // user is guest (not logged in)
+    if (token == null) // user is guest (not logged in)
     {
-        if(addBtn != null)
-        {
+        if (addBtn != null) {
             addBtn.style.setProperty("display", "none", "important")
         }
-        
+
         loginDiv.style.setProperty("display", "flex", "important")
         logoutDiv.style.setProperty("display", "none", "important")
-    }else { // for logged in user
+    } else { // for logged in user
 
-        if(addBtn != null)
-        {
+        if (addBtn != null) {
             addBtn.style.setProperty("display", "block", "important")
         }
-        
+
         loginDiv.style.setProperty("display", "none", "important")
         logoutDiv.style.setProperty("display", "flex", "important")
 
@@ -152,57 +143,53 @@ function setupUI()
 
 
 // ======= AUTH FUNCTIONS ==========
-function loginBtnClicked()
-{
+function loginBtnClicked() {
     const username = document.getElementById("username-input").value
     const password = document.getElementById("password-input").value
 
     const params = {
         "username": username,
-        "password" : password
+        "password": password
     }
 
     const url = `${baseUrl}/login`
     toggleLoader(true)
     axios.post(url, params)
-    .then((response) => {        
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("user", JSON.stringify(response.data.user))
+        .then((response) => {
+            localStorage.setItem("token", response.data.token)
+            localStorage.setItem("user", JSON.stringify(response.data.user))
 
-        const modal = document.getElementById("login-modal")
-        const modalInstance = bootstrap.Modal.getInstance(modal)
-        modalInstance.hide()
-        
-        showAlert("Logged in successfully", "success")
-        setupUI()
+            const modal = document.getElementById("login-modal")
+            const modalInstance = bootstrap.Modal.getInstance(modal)
+            modalInstance.hide()
 
-    }).catch((error) => {
-        const message = error.response.data.message
-        showAlert(message, "danger")
-    }).finally(()=> {
-        toggleLoader(false)
-    })
+            showAlert("Logged in successfully", "success")
+            setupUI()
+
+        }).catch((error) => {
+            const message = error.response.data.message
+            showAlert(message, "danger")
+        }).finally(() => {
+            toggleLoader(false)
+        })
 }
 
-function toggleLoader(show = true)
-{
-    if(show)
-    {
+function toggleLoader(show = true) {
+    if (show) {
         document.getElementById("loader").style.visibility = 'visible'
-    }else {
+    } else {
         document.getElementById("loader").style.visibility = 'hidden'
     }
 }
 
 
 
-function registerBtnClicked()
-{
+function registerBtnClicked() {
     const name = document.getElementById("register-name-input").value
     const username = document.getElementById("register-username-input").value
     const password = document.getElementById("register-password-input").value
     const image = document.getElementById("register-image-input").files[0]
-    
+
 
     let formData = new FormData()
     formData.append("name", name)
@@ -210,7 +197,7 @@ function registerBtnClicked()
     formData.append("password", password)
     formData.append("image", image)
 
-    
+
     const headers = {
         "Content-Type": "multipart/form-data",
     }
@@ -221,31 +208,30 @@ function registerBtnClicked()
     axios.post(url, formData, {
         headers: headers
     })
-    .then((response) => {
-        console.log(response.data)
+        .then((response) => {
+            console.log(response.data)
 
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("user", JSON.stringify(response.data.user))
+            localStorage.setItem("token", response.data.token)
+            localStorage.setItem("user", JSON.stringify(response.data.user))
 
-        const modal = document.getElementById("register-modal")
-        const modalInstance = bootstrap.Modal.getInstance(modal)
-        modalInstance.hide()
-        
-        showAlert("New User Registered Successfully", "success")
-        setupUI()
+            const modal = document.getElementById("register-modal")
+            const modalInstance = bootstrap.Modal.getInstance(modal)
+            modalInstance.hide()
 
-    }).catch((error) => {
-        const message = error.response.data.message
-        showAlert(message, "danger")
-    })
-    .finally(() => {
-        toggleLoader(false)
-    })
+            showAlert("New User Registered Successfully", "success")
+            setupUI()
+
+        }).catch((error) => {
+            const message = error.response.data.message
+            showAlert(message, "danger")
+        })
+        .finally(() => {
+            toggleLoader(false)
+        })
 }
 
 
-function logout()
-{
+function logout() {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     showAlert("Logged out successfully")
@@ -253,8 +239,7 @@ function logout()
 }
 
 
-function showAlert(customMessage, type="success")
-{
+function showAlert(customMessage, type = "success") {
     const alertPlaceholder = document.getElementById('success-alert')
 
     const alert = (message, type) => {
@@ -269,33 +254,31 @@ function showAlert(customMessage, type="success")
         alertPlaceholder.append(wrapper)
     }
 
-    alert(customMessage, type) 
-    
+    alert(customMessage, type)
+
     // todo: hide the alert
     setTimeout(() => {
         // const alertToHide = bootstrap.Alert.getOrCreateInstance('#success-alert')
-        
+
         // document.getElementById("success-alert").hide();
 
         // const alert = document.getElementById("success-alert")
         // const modalAlert = bootstrap.Alert.getInstance(alert)
         // modalAlert.hide()
     }, 2000);
-    
-    
+
+
 }
 
 
 
-function getCurrentUser()
-{
-    let user = null 
+function getCurrentUser() {
+    let user = null
     const storageUser = localStorage.getItem("user")
 
-    if(storageUser != null)
-    {
+    if (storageUser != null) {
         user = JSON.parse(storageUser)
     }
-    
+
     return user
 }

@@ -18,7 +18,7 @@
     });
     //=====// INFINITE SCROLL //=======//
     setupUI()
-// "http://localhost:3030/api/v1/posts"
+        "https://tarmeezacademy.com/api/v1/posts"
 // 
     
     getPosts()
